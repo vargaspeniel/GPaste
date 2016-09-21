@@ -466,6 +466,11 @@ global:
 LIBGPASTE_3_22_0 {
 global:
     g_paste_clipboard_store;
-
     g_paste_clipboards_manager_store;
+
+    g_paste_ui_page_get_type;
+    g_paste_ui_page_new;
+    g_paste_ui_page_set_active;
+    g_paste_ui_page_switcher_get_type;
+    g_paste_ui_page_switcher_new;
 } LIBGPASTE_3_20_0;

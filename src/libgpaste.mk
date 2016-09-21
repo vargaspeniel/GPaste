@@ -69,6 +69,8 @@ lib_libgpaste_la_public_headers =                                             \
 	%D%/libgpaste/ui/gpaste-ui-item-action.h                              \
 	%D%/libgpaste/ui/gpaste-ui-item-skeleton.h                            \
 	%D%/libgpaste/ui/gpaste-ui-new-item.h                                 \
+	%D%/libgpaste/ui/gpaste-ui-page.h                                     \
+	%D%/libgpaste/ui/gpaste-ui-page-switcher.h                            \
 	%D%/libgpaste/ui/gpaste-ui-panel.h                                    \
 	%D%/libgpaste/ui/gpaste-ui-panel-history.h                            \
 	%D%/libgpaste/ui/gpaste-ui-reexec.h                                   \
@@ -134,6 +136,8 @@ lib_libgpaste_la_source_files =                                               \
 	%D%/libgpaste/ui/gpaste-ui-item-action.c                              \
 	%D%/libgpaste/ui/gpaste-ui-item-skeleton.c                            \
 	%D%/libgpaste/ui/gpaste-ui-new-item.c                                 \
+	%D%/libgpaste/ui/gpaste-ui-page.c                                     \
+	%D%/libgpaste/ui/gpaste-ui-page-switcher.c                            \
 	%D%/libgpaste/ui/gpaste-ui-panel.c                                    \
 	%D%/libgpaste/ui/gpaste-ui-panel-history.c                            \
 	%D%/libgpaste/ui/gpaste-ui-reexec.c                                   \
