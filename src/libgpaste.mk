@@ -151,6 +151,7 @@ lib_libgpaste_la_CPPFLAGS =       \
 	$(NULL)
 
 lib_libgpaste_la_CFLAGS =    \
+	$(GCR_CFLAGS)        \
 	$(GDK_CFLAGS)        \
 	$(GDK_PIXBUF_CFLAGS) \
 	$(GLIB_CFLAGS)       \
@@ -159,6 +160,7 @@ lib_libgpaste_la_CFLAGS =    \
 	$(NULL)
 
 lib_libgpaste_la_LIBADD =  \
+	$(GCR_LIBS)        \
 	$(GDK_LIBS)        \
 	$(GDK_PIXBUF_LIBS) \
 	$(GLIB_LIBS)       \

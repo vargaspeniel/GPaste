@@ -32,6 +32,7 @@ m4_define([gtk4_api_required],   [G_ENCODE_VERSION(gtk4_major_required, gtk4_min
 m4_define([gtk4_required],       [gtk4_major_required.gtk4_minor_required.0])
 
 # Other dependencies
+m4_define([gcr_required],        [3.20.0])
 m4_define([gdk_pixbuf_required], [2.32.0])
 m4_define([gir_required],        [1.52.0])
 m4_define([gjs_required],        [1.50.0])
@@ -131,6 +132,7 @@ PKG_INSTALLDIR
 PKG_CHECK_MODULES(GLIB,       [glib-2.0 >= glib_required gobject-2.0 >= glib_required gio-2.0 >= glib_required])
 PKG_CHECK_MODULES(GTK,        [${GDK_DEP} >= ${GTK_REQUIRED} ${GTK_DEP} >= ${GTK_REQUIRED} pango])
 PKG_CHECK_MODULES(GDK_PIXBUF, [gdk-pixbuf-2.0 >= gdk_pixbuf_required])
+PKG_CHECK_MODULES(GCR,        [gcr-base-3 >= gcr_required])
 PKG_CHECK_MODULES(X11,        [x11 xi])
 PKG_CHECK_MODULES(APPSTREAM,  [appstream-glib])
 
