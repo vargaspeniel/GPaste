@@ -12,8 +12,12 @@ static gboolean
 g_paste_text_item_equals (const GPasteItem *self,
                           const GPasteItem *other)
 {
-    return (_G_PASTE_IS_TEXT_ITEM (other) &&
-            G_PASTE_ITEM_CLASS (g_paste_text_item_parent_class)->equals (self, other));
+    g_return_val_if_fail (_G_PASTE_IS_TEXT_ITEM (self), FALSE);
+
+    if (!_G_PASTE_IS_TEXT_ITEM (other))
+        return FALSE;
+
+    return G_PASTE_ITEM_CLASS (g_paste_text_item_parent_class)-> equals (self, other);
 }
 
 static const gchar *

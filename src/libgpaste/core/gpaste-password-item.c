@@ -82,10 +82,9 @@ g_paste_password_item_get_kind (const GPasteItem *self G_GNUC_UNUSED)
 
 static gboolean
 g_paste_password_item_equals (const GPasteItem *self,
-                              const GPasteItem *other)
+                              const GPasteItem *other G_GNUC_UNUSED)
 {
     g_return_val_if_fail (_G_PASTE_IS_PASSWORD_ITEM (self), FALSE);
-    g_return_val_if_fail (_G_PASTE_IS_ITEM (other), FALSE);
 
     /* Passwords are never considered equals, except when it's the exact same object */
     return FALSE;

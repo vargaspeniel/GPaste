@@ -84,6 +84,8 @@ static gboolean
 g_paste_image_item_equals (const GPasteItem *self,
                            const GPasteItem *other)
 {
+    g_return_val_if_fail (_G_PASTE_IS_IMAGE_ITEM (self), FALSE);
+
     if (!_G_PASTE_IS_IMAGE_ITEM (other))
         return FALSE;
 
