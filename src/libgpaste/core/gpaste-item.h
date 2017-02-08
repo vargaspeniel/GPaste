@@ -15,7 +15,8 @@
 
 G_BEGIN_DECLS
 
-typedef enum {
+typedef enum
+{
     G_PASTE_ITEM_STATE_IDLE,
     G_PASTE_ITEM_STATE_ACTIVE
 } GPasteItemState;
@@ -59,6 +60,12 @@ void g_paste_item_add_size    (GPasteItem *self,
                                guint64     size);
 void g_paste_item_remove_size (GPasteItem *self,
                                guint64     size);
+
+void g_paste_item_set_targets (GPasteItem *self,
+                               GdkAtom    *targets,
+                               gint32      n_targets);
+
+const GtkTargetList *g_paste_item_get_targets (const GPasteItem *self);
 
 GPasteItem *g_paste_item_new (GType        type,
                               const gchar *value);

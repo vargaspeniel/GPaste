@@ -188,6 +188,8 @@ g_paste_clipboards_manager_text_ready (GPasteClipboard *clipboard,
                 item = G_PASTE_ITEM (g_paste_uris_item_new (text));
             else
                 item = G_PASTE_ITEM (g_paste_text_item_new (text));
+            g_paste_item_set_targets (item, targets, data->n_targets);
+            targets = NULL;
         }
 
         if (g_paste_settings_get_synchronize_clipboards (priv->settings))
@@ -214,7 +216,11 @@ g_paste_clipboards_manager_image_ready (GPasteClipboard *clipboard,
 
     /* If our contents got updated */
     if (image && data->track)
+    {
         item = G_PASTE_ITEM (g_paste_image_item_new (image));
+        g_paste_item_set_targets (item, targets, data->n_targets);
+        targets = NULL;
+    }
 
     g_paste_clipboards_manager_notify_finish (priv, clipboard, item, NULL, something_in_clipboard);
 }
