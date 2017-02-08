@@ -157,6 +157,8 @@ g_paste_clipboards_manager_notify_finish (GPasteClipboardsManagerPrivate *priv,
 typedef struct {
     GPasteClipboardsManagerPrivate *priv;
     GPasteClipboard                *clip;
+    GdkAtom                        *targets;
+    gint32                          n_targets;
     gboolean                        track;
     gboolean                        uris_available;
 } GPasteClipboardsManagerCallbackData;
@@ -167,6 +169,7 @@ g_paste_clipboards_manager_text_ready (GPasteClipboard *clipboard,
                                        gpointer         user_data)
 {
     g_autofree GPasteClipboardsManagerCallbackData *data = user_data;
+    g_autofree GdkAtom *targets = data->targets;
     GPasteClipboardsManagerPrivate *priv = data->priv;
     GPasteItem *item = NULL;
     const gchar *synchronized_text = NULL;
@@ -200,6 +203,7 @@ g_paste_clipboards_manager_image_ready (GPasteClipboard *clipboard,
                                         gpointer         user_data)
 {
     g_autofree GPasteClipboardsManagerCallbackData *data = user_data;
+    g_autofree GdkAtom *targets = data->targets;
     GPasteClipboardsManagerPrivate *priv = data->priv;
     GPasteItem *item = NULL;
 
@@ -224,11 +228,12 @@ g_paste_clipboards_manager_targets_ready (GtkClipboard     *clipboard G_GNUC_UNU
 
     g_debug ("clipboards-manager: targets ready");
 
-    if (gtk_selection_data_get_length (targets) >= 0)
+    if (gtk_selection_data_get_length (targets) >= 0 &&
+        gtk_selection_data_get_targets (targets, &data->targets, &data->n_targets))
     {
-        data->uris_available = gtk_selection_data_targets_include_uri (targets);
+        data->uris_available = gtk_targets_include_uri (data->targets, data->n_targets);
 
-        if (data->uris_available || gtk_selection_data_targets_include_text (targets))
+        if (data->uris_available || gtk_targets_include_text (data->targets, data->n_targets))
         {
             /* Update our cache from the real Clipboard */
             g_paste_clipboard_set_text (data->clip,
@@ -236,7 +241,7 @@ g_paste_clipboards_manager_targets_ready (GtkClipboard     *clipboard G_GNUC_UNU
                                         data);
             data = NULL;
         }
-        else if (g_paste_settings_get_images_support (data->priv->settings) && gtk_selection_data_targets_include_image (targets, FALSE))
+        else if (g_paste_settings_get_images_support (data->priv->settings) && gtk_targets_include_image (data->targets, data->n_targets, FALSE))
         {
             /* Update our cache from the real Clipboard */
             g_paste_clipboard_set_image (data->clip,
@@ -279,6 +284,8 @@ g_paste_clipboards_manager_notify (GPasteClipboard     *clipboard,
 
     data->priv = priv;
     data->clip = clipboard;
+    data->targets = NULL;
+    data->n_targets = 0;
     data->track = track;
 
     gtk_clipboard_request_contents (g_paste_clipboard_get_real (clipboard),
