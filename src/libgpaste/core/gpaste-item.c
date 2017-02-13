@@ -22,11 +22,7 @@ typedef enum
 {
     FIRST_ATOM,
 
-    INCR = FIRST_ATOM,
-    MULTIPLE,
-    TIMESTAMP,
-    TARGETS,
-    SAVE_TARGETS,
+    TARGETS = FIRST_ATOM,
 
     LAST_ATOM
 } ReservedAtom;
@@ -41,11 +37,7 @@ _g_paste_atoms_initialize (void)
     if (initialized)
         return;
 
-    reserved_atoms[INCR] = gdk_atom_intern_static_string ("INCR");
-    reserved_atoms[MULTIPLE] = gdk_atom_intern_static_string ("MULTIPLE");
-    reserved_atoms[TIMESTAMP] = gdk_atom_intern_static_string ("TIMESTAMP");
     reserved_atoms[TARGETS] = gdk_atom_intern_static_string ("TARGETS");
-    reserved_atoms[SAVE_TARGETS] = gdk_atom_intern_static_string ("SAVE_TARGETS");
 
     initialized = TRUE;
 }

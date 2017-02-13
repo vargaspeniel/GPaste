@@ -295,24 +295,31 @@ g_paste_clipboard_get_clipboard_data (GtkClipboard     *clipboard G_GNUC_UNUSED,
     GdkAtom targets[1] = { gtk_selection_data_get_target (selection_data) };
 
     /* The content is requested as text */
-    if (gtk_targets_include_text (targets, 1))
-        gtk_selection_data_set_text (selection_data, g_paste_item_get_real_value (item), -1);
+    if (gtk_targets_include_text (targets, 1) || g_str_has_prefix (gdk_atom_name (targets[0]), "text/"))
+    {
+        /* Do nothing, we'll hit the fallback which is text at the end */
+    }
     else if (_G_PASTE_IS_IMAGE_ITEM (item))
     {
+        /* The content is requested as pixbuf */
         if (gtk_targets_include_image (targets, 1, TRUE))
+        {
             gtk_selection_data_set_pixbuf (selection_data, g_paste_image_item_get_image (G_PASTE_IMAGE_ITEM (item)));
+            return;
+        }
     }
-    /* The content is requested as uris */
-    else
+    else if  (_G_PASTE_IS_URIS_ITEM (item))
     {
-        g_return_if_fail (_G_PASTE_IS_URIS_ITEM (item));
-
         const gchar * const *uris = g_paste_uris_item_get_uris (G_PASTE_URIS_ITEM (item));
 
+        /* The content is requested as uris */
         if (gtk_targets_include_uri (targets, 1))
+        {
             gtk_selection_data_set_uris (selection_data, (GStrv) uris);
+            return;
+        }
         /* The content is requested as special gnome-copied-files by nautilus */
-        else
+        else if (targets[0] == g_paste_clipboard_copy_files_target)
         {
             g_autoptr (GString) copy_string = g_string_new ("copy");
             guint64 length = g_strv_length ((GStrv) uris);
@@ -326,8 +333,14 @@ g_paste_clipboard_get_clipboard_data (GtkClipboard     *clipboard G_GNUC_UNUSED,
             for (guint64 i = 0; i < length; ++i)
                 copy_files_data[i] = (guchar) str[i];
             gtk_selection_data_set (selection_data, g_paste_clipboard_copy_files_target, 8, copy_files_data, length);
+            return;
         }
     }
+
+    /* Fallback to text */
+    const gchar *val = g_paste_item_get_real_value (item);
+    guint64 len = strlen (val);
+    gtk_selection_data_set (selection_data, targets[0], 8, (guchar *) val, len);
 }
 
 static void
@@ -338,29 +351,74 @@ g_paste_clipboard_clear_clipboard_data (GtkClipboard *clipboard G_GNUC_UNUSED,
 }
 
 static void
-g_paste_clipboard_private_select_uris (GPasteClipboardPrivate *priv,
-                                       GPasteUrisItem         *item)
+g_paste_clipboard_private_do_select_generic (GPasteClipboardPrivate *priv,
+                                             GPasteItem             *item,
+                                             GtkTargetList          *target_list)
 {
-    GtkClipboard *real = priv->real;
-    g_autoptr (GtkTargetList) target_list = gtk_target_list_new (NULL, 0);
+    g_paste_clipboard_private_set_text (priv, g_paste_item_get_real_value (item));
 
-    g_debug("%s: select uris", gdk_atom_name (gtk_clipboard_get_selection (priv->real)));
-
-    g_paste_clipboard_private_set_text (priv, g_paste_item_get_real_value (_G_PASTE_ITEM (item)));
-
-    gtk_target_list_add_text_targets (target_list, 0);
-    gtk_target_list_add_uri_targets (target_list, 0);
-    gtk_target_list_add (target_list, g_paste_clipboard_copy_files_target, 0, 0);
-
-    gint32 n_targets;
+    gint32 n_targets = 0;
     GtkTargetEntry *targets = gtk_target_table_new_from_list (target_list, &n_targets);
-    gtk_clipboard_set_with_owner (real,
+
+    for (gint32 i = 0; i < n_targets; ++i)
+        g_debug("target %s", targets[i].target);
+
+    gtk_clipboard_set_with_owner (priv->real,
                                   targets,
                                   n_targets,
                                   g_paste_clipboard_get_clipboard_data,
                                   g_paste_clipboard_clear_clipboard_data,
                                   g_object_ref (item));
     gtk_target_table_free (targets, n_targets);
+}
+
+static void
+g_paste_clipboard_private_select_from_targets (GPasteClipboardPrivate *priv,
+                                               GPasteItem             *item)
+{
+    g_debug("%s: select from targets", gdk_atom_name (gtk_clipboard_get_selection (priv->real)));
+    g_paste_clipboard_private_do_select_generic (priv, item, (GtkTargetList *) g_paste_item_get_targets (item));
+}
+
+static void
+g_paste_clipboard_private_select_image_item (GPasteClipboardPrivate *priv,
+                                             GPasteItem             *item)
+{
+    g_autoptr (GtkTargetList) target_list = gtk_target_list_new (NULL, 0);
+
+    g_debug("%s: select image", gdk_atom_name (gtk_clipboard_get_selection (priv->real)));
+
+    gtk_target_list_add_image_targets (target_list, 0, FALSE);
+
+    g_paste_clipboard_private_do_select_generic (priv, item, target_list);
+}
+
+static void
+g_paste_clipboard_private_select_uris (GPasteClipboardPrivate *priv,
+                                       GPasteItem             *item)
+{
+    g_autoptr (GtkTargetList) target_list = gtk_target_list_new (NULL, 0);
+
+    g_debug("%s: select uris", gdk_atom_name (gtk_clipboard_get_selection (priv->real)));
+
+    gtk_target_list_add_text_targets (target_list, 0);
+    gtk_target_list_add_uri_targets (target_list, 0);
+    gtk_target_list_add (target_list, g_paste_clipboard_copy_files_target, 0, 0);
+
+    g_paste_clipboard_private_do_select_generic (priv, item, target_list);
+}
+
+static void
+g_paste_clipboard_private_select_text (GPasteClipboardPrivate *priv,
+                                       GPasteItem             *item)
+{
+    g_autoptr (GtkTargetList) target_list = gtk_target_list_new (NULL, 0);
+
+    g_debug("%s: select text", gdk_atom_name (gtk_clipboard_get_selection (priv->real)));
+
+    gtk_target_list_add_text_targets (target_list, 0);
+
+    g_paste_clipboard_private_do_select_generic (priv, item, target_list);
 }
 
 /**
@@ -478,15 +536,9 @@ g_paste_clipboard_on_image_ready (GtkClipboard *clipboard G_GNUC_UNUSED,
                                                                         -1);
 
     if (!g_paste_str_equal (checksum, priv->image_checksum))
-    {
-        g_paste_clipboard_private_select_image (priv,
-                                                image,
-                                                checksum);
-    }
+        g_paste_clipboard_private_select_image (priv, image, checksum);
     else
-    {
         image = NULL;
-    }
 
     if (data->callback)
         data->callback (self, image, data->user_data);
@@ -539,15 +591,8 @@ g_paste_clipboard_select_item (GPasteClipboard *self,
 
     if (_G_PASTE_IS_IMAGE_ITEM (item))
     {
-        const GPasteImageItem *image_item = _G_PASTE_IMAGE_ITEM (item);
-        const gchar *checksum = g_paste_image_item_get_checksum (image_item);
-
-        if (!g_paste_str_equal (checksum, priv->image_checksum))
-        {
-            g_paste_clipboard_private_select_image (priv,
-                                                    g_paste_image_item_get_image (image_item),
-                                                    checksum);
-        }
+        if (!g_paste_str_equal (g_paste_image_item_get_checksum (_G_PASTE_IMAGE_ITEM (item)), priv->image_checksum))
+            g_paste_clipboard_private_select_image_item (priv, item);
     }
     else
     {
@@ -555,10 +600,12 @@ g_paste_clipboard_select_item (GPasteClipboard *self,
 
         if (!g_paste_str_equal (text, priv->text))
         {
-            if (_G_PASTE_IS_URIS_ITEM (item))
-                g_paste_clipboard_private_select_uris (priv, G_PASTE_URIS_ITEM (item));
+            if (g_paste_item_get_targets (item))
+                g_paste_clipboard_private_select_from_targets (priv, item);
+            else if (_G_PASTE_IS_URIS_ITEM (item))
+                g_paste_clipboard_private_select_uris (priv, item);
             else  if (_G_PASTE_IS_TEXT_ITEM (item))
-                g_paste_clipboard_select_text (self, text);
+                g_paste_clipboard_private_select_text (priv, item);
             else
                 g_assert_not_reached ();
         }
