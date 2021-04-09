@@ -43,6 +43,95 @@
   <url type="translate">https://github.com/Keruspe/GPaste</url>
   <translation type="gettext">GPaste</translation>
   <releases>
+      <release version="3.40.0" type="stable" date="2021-04-09">
+          <description>
+              <p>First release for GNOME 40. Changes:</p>
+              <ul>
+                  <li>port to gnome-shell 40</li>
+                  <li>placeholder for gnome-shell prefs</li>
+              </ul>
+          </description>
+      </release>
+      <release version="3.38.6" type="stable" date="2020-03-08">
+          <description>
+              <p>This is a maintenance release. Changes:</p>
+              <ul>
+                  <li>fix X11 keybinder outside of GNOME</li>
+              </ul>
+          </description>
+      </release>
+      <release version="3.38.5" type="stable" date="2021-02-03">
+          <description>
+              <p>This is a maintenance release. Changes:</p>
+              <ul>
+                  <li>better handling and reporting of invalid uuids passed to gpaste-client</li>
+                  <li>gpaste-client now has a --use-index argument for several subcommands to use index instead of uuid</li>
+              </ul>
+          </description>
+      </release>
+      <release version="3.38.4" type="stable" date="2020-12-22">
+          <description>
+              <p>This is a maintenance release. Changes:</p>
+              <ul>
+                  <li>fix the make-password keybinding</li>
+                  <li>updated translations</li>
+              </ul>
+          </description>
+      </release>
+      <release version="3.38.3" type="stable" date="2020-11-02">
+          <description>
+              <p>This is a maintenance release. Changes:</p>
+              <ul>
+                  <li>gnome-shell extension warning fixes</li>
+                  <li>updated translations</li>
+              </ul>
+          </description>
+      </release>
+      <release version="3.38.2" type="stable" date="2020-10-03">
+          <description>
+              <p>This is a maintenance release. Changes:</p>
+              <ul>
+                  <li>gnome-shell extension cosmetic updates</li>
+              </ul>
+          </description>
+      </release>
+      <release version="3.38.1" type="stable" date="2020-10-01">
+          <description>
+              <p>This is a maintenance release. Changes:</p>
+              <ul>
+                  <li>Disable images support by default (can be reenabled in preferences)</li>
+                  <li>Search now includes passwords (using their names)</li>
+                  <li>systemd integration enhancements</li>
+              </ul>
+          </description>
+      </release>
+      <release version="3.38.0" type="stable" date="2020-09-15">
+          <description>
+              <p>First release for GNOME 3.38. Changes:</p>
+              <ul>
+                  <li>Drop the Tracking DBus signal</li>
+                  <li>Switch to uuids to identify items</li>
+                  <li>Bump DBus interface to org.gnome.GPaste2</li>
+                  <li>Update to gnome-shell 3.38.0</li>
+              </ul>
+          </description>
+      </release>
+      <release version="3.36.5" type="stable" date="2020-03-08">
+          <description>
+              <p>This is a maintenance release. Changes:</p>
+              <ul>
+                  <li>fix X11 keybinder outside of GNOME</li>
+              </ul>
+          </description>
+      </release>
+      <release version="3.36.4" type="stable" date="2020-10-03">
+          <description>
+              <p>This is a maintenance release. Changes:</p>
+              <ul>
+                  <li>gnome-shell extension cosmetic updates</li>
+              </ul>
+          </description>
+      </release>
       <release version="3.36.3" type="stable" date="2020-03-27">
           <description>
               <p>This is a maintenance release. Changes:</p>

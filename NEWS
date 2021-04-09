@@ -1,3 +1,62 @@
+NEW in 3.40.0 (09/04/2021)
+=============
+
+- port to gnome-shell 40
+- placeholder for gnome-shell prefs
+
+NEW in 3.38.6 (08/03/2021)
+=============
+
+- fix X11 keybinder outside of GNOME
+
+NEW in 3.38.5 (03/02/2021)
+=============
+
+- better handling and reporting of invalid uuids passed to gpaste-client
+- gpaste-client now has a --use-index argument for several subcommands to use index instead of uuid
+
+NEW in 3.38.4 (22/12/2020)
+=============
+
+- fix the make-password keybinding
+- updated translations
+
+NEW in 3.38.3 (02/11/2020)
+=============
+
+- gnome-shell extension warning fixes
+- updated translations
+
+NEW in 3.38.2 (03/10/2020)
+=============
+
+- gnome-shell extension cosmetic updates
+
+NEW in 3.38.1 (01/10/2020)
+=============
+
+- Disable images support by default (can be reenabled in preferences)
+- Search now includes passwords (using their names)
+- systemd integration enhancements
+
+NEW in 3.38.0 (15/09/2020)
+=============
+
+- Drop the Tracking DBus signal
+- Switch to uuids to identify items
+- Bump DBus interface to org.gnome.GPaste2
+- Update to gnome-shell 3.38.0
+
+NEW in 3.36.5 (08/03/2021)
+=============
+
+- fix X11 keybinder outside of GNOME
+
+NEW in 3.36.4 (03/10/2020)
+=============
+
+- gnome-shell extension cosmetic updates
+
 NEW in 3.36.3 (27/03/2020)
 =============
 

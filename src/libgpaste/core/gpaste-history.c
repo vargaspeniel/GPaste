@@ -403,12 +403,14 @@ g_paste_history_remove (GPasteHistory *self,
  * @uuid: the uuid of the #GPasteItem to delete
  *
  * Delete a #GPasteItem from the #GPasteHistory
+ *
+ * Returns: whether we removed anything
  */
-G_PASTE_VISIBLE void
+G_PASTE_VISIBLE gboolean
 g_paste_history_remove_by_uuid (GPasteHistory *self,
                                 const gchar   *uuid)
 {
-    g_return_if_fail (_G_PASTE_IS_HISTORY (self));
+    g_return_val_if_fail (_G_PASTE_IS_HISTORY (self), FALSE);
 
     GPasteHistoryPrivate *priv = g_paste_history_get_instance_private (self);
 
@@ -417,7 +419,11 @@ g_paste_history_remove_by_uuid (GPasteHistory *self,
     guint64 index;
     GList *item = g_paste_history_private_get_item_by_uuid (priv, uuid, &index);
 
+    if (!item)
+        return FALSE;
+
     g_paste_history_remove_common (self, priv, item, index);
+    return TRUE;
 }
 /**
  * g_paste_history_refresh_item_size:
@@ -525,18 +531,24 @@ g_paste_history_dup (GPasteHistory *self,
  * @uuid: the uuid of the #GPasteItem to select
  *
  * Select a #GPasteItem from the #GPasteHistory
+ *
+ * Returns: whether the item could be selected
  */
-G_PASTE_VISIBLE void
+G_PASTE_VISIBLE gboolean
 g_paste_history_select (GPasteHistory *self,
                         const gchar   *uuid)
 {
-    g_return_if_fail (_G_PASTE_IS_HISTORY (self));
+    g_return_val_if_fail (_G_PASTE_IS_HISTORY (self), FALSE);
     g_debug ("history: select '%s'", uuid);
 
     GPasteItem *item = g_paste_history_private_get_by_uuid (_g_paste_history_get_instance_private (self), uuid);
 
+    if (!item)
+        return FALSE;
+
     _g_paste_history_add (self, item, FALSE);
     g_paste_history_selected (self, item);
+    return TRUE;
 }
 
 static void
@@ -1071,31 +1083,6 @@ g_paste_history_search (const GPasteHistory *self,
     if (!regex)
         return NULL;
 
-    /* Check whether we include the index in the search too */
-    gboolean include_idx = FALSE;
-    guint64 idx = 0;
-    guint64 len = strlen (pattern);
-
-    if (len < 5)
-    {
-        for (guint64 i = 0; i < len; ++i)
-        {
-            char c = pattern[i];
-
-            if (c >= '0' && c <= '9')
-            {
-                include_idx = TRUE;
-                idx *= 10;
-                idx += (c - '0');
-            }
-            else
-            {
-                include_idx = FALSE;
-                break;
-            }
-        }
-    }
-
     g_autoptr (GArray) results = g_array_new (TRUE, /* zero-terminated */
                                               TRUE, /* clear */
                                               sizeof (gchar *));
@@ -1103,16 +1090,21 @@ g_paste_history_search (const GPasteHistory *self,
 
     for (GList *history = priv->history; history; history = g_list_next (history), ++index)
     {
+        const GPasteItem *item = (GPasteItem *) history->data;
+        const gchar *uuid = g_paste_item_get_uuid (item);
         gboolean match = FALSE;
-        if (include_idx && idx == index)
+
+        if (g_paste_str_equal (pattern, uuid))
             match = TRUE;
-        else if (g_regex_match (regex, g_paste_item_get_value (history->data), G_REGEX_MATCH_NOTEMPTY|G_REGEX_MATCH_NEWLINE_ANY, NULL))
+        else if (_G_PASTE_IS_PASSWORD_ITEM (item) && g_paste_str_equal(pattern, g_paste_password_item_get_name (_G_PASTE_PASSWORD_ITEM (item))))
+            match = TRUE;
+        else if (g_regex_match (regex, g_paste_item_get_value (item), G_REGEX_MATCH_NOTEMPTY|G_REGEX_MATCH_NEWLINE_ANY, NULL))
             match = TRUE;
 
         if (match)
         {
-            gchar *uuid = g_strdup (g_paste_item_get_uuid (history->data));
-            g_array_append_val (results, uuid);
+            gchar *id = g_strdup (uuid);
+            g_array_append_val (results, id);
         }
     }
 

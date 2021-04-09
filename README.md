@@ -7,6 +7,8 @@ GPaste is a clipboard management system.
 See <https://www.imagination-land.org/posts/2012-12-01-gpaste-released.html> for more information about what clipboard
 managers are.
 
+Translators can use [weblate](https://hosted.weblate.org/projects/gpaste/gpaste/) to contribute.
+
 A library is available for development purposes:
 
 * `libgpaste` contains all the basic objects used by GPaste and allows you to manage preferences and the GPaste daemon.
@@ -39,6 +41,6 @@ Steps to install it after cloning (skip the `./autogen.sh` part if you're buildi
 
 You can see everything I'll post about GPaste [there](https://www.imagination-land.org/tags/GPaste.html).
 
-Latest release for GNOME 3.36 is: [GPaste 3.36.3](https://www.imagination-land.org/posts/2020-03-27-gpaste-3.36.3-released.html).
+Latest release for GNOME 40 is: [GPaste 3.40.0](https://www.imagination-land.org/posts/2021-04-09-gpaste-3.40.0-released.html).
 
-Direct link to download: <https://www.imagination-land.org/files/gpaste/gpaste-3.36.3.tar.xz>
+Direct link to download: <https://www.imagination-land.org/files/gpaste/gpaste-3.40.0.tar.xz>

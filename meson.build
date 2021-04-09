@@ -1,17 +1,17 @@
 project('GPaste',
   'c',
-  version: '3.36.3',
-  meson_version: '>=0.46.0',
+  version: '3.40.0',
+  meson_version: '>=0.50.0',
 )
 
 apiversion = '1.0'
-gpaste_soversion = '11.1.7'
+gpaste_soversion = '13.0.4'
 
 glib_req='>=2.64.0'
 gdk_pixbuf_req='>=2.38.0'
 gjs_req='>=1.54.0'
 gtk3_req='>=3.24.0'
-mutter_clutter_req='>=3.36.0'
+mutter_clutter_req='>=40.0'
 
 appstream_dep = dependency('appstream-glib')
 gdk_dep = dependency('gdk-3.0', version: gtk3_req)
@@ -20,6 +20,7 @@ gio_dep = dependency('gio-2.0', version: glib_req)
 glib_dep = dependency('glib-2.0', version: glib_req)
 gobject_dep = dependency('gobject-2.0', version: glib_req)
 gtk_dep = dependency('gtk+-3.0', version: gtk3_req)
+gtk3_dep = dependency('gtk+-3.0', version: '>=3.24')
 pango_dep = dependency('pango')
 
 # Don't make dbus/gnome-control-center a build dependency if so desired.
@@ -37,7 +38,7 @@ endif
 libgpaste_deps = [ gdk_dep, gdk_pixbuf_dep, glib_dep, gtk_dep ]
 
 if get_option('introspection')
-  mutter_clutter_dep = dependency('mutter-clutter-6', version: mutter_clutter_req)
+  mutter_clutter_dep = dependency('mutter-clutter-8', version: mutter_clutter_req)
   gjs_dep = dependency('gjs-1.0', version: gjs_req)
 endif
 

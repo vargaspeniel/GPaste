@@ -168,8 +168,7 @@ class GPasteIndicator extends PanelMenu.Button {
                     i.setUuid(this._searchResults[offset + index]);
                 });
 
-                /* If we had no result, updateForSize would have returned false */
-                this._dummyHistoryItem.hide();
+                this._updateVisibility(results == 0);
 
                 this._history.slice(results - offset, maxSize).forEach(function(i) {
                     i.setIndex(-1);
@@ -205,25 +204,34 @@ class GPasteIndicator extends PanelMenu.Button {
 
         this._pageSwitcher.setMaxDisplayedSize(newSize);
 
-        const offset = this._pageSwitcher.getPageOffset();
+        this._client.get_history_name((client, result) => {
+            const name = client.get_history_name_finish(result);
 
-        if (newSize > oldSize) {
-            for (let index = oldSize; index < newSize; ++index) {
-                let item = new Item.GPasteItem(this._client, elementSize, index + offset);
-                this.menu.addMenuItem(item, this._headerSize + this._postHeaderSize + index);
-                this._history[index] = item;
-            }
-        } else {
-            for (let i = newSize; i < oldSize; ++i) {
-                this._history.pop().destroy();
-            }
-        }
+            this._client.get_history_size(name, (client, result) => {
+                const offset = this._pageSwitcher.getPageOffset();
 
-        if (offset === 0 || oldSize === 0) {
-            this._updatePage(1);
-        } else {
-            this._updatePage((offset / oldSize) + 1);
-        }
+                if (newSize > oldSize) {
+                    const realSize = client.get_history_size_finish(result);
+
+                    for (let index = oldSize; index < newSize; ++index) {
+                        let realIndex = index + offset;
+                        let item = new Item.GPasteItem(this._client, elementSize, (realIndex < realSize) ? realIndex : -1);
+                        this.menu.addMenuItem(item, this._headerSize + this._postHeaderSize + index);
+                        this._history[index] = item;
+                    }
+                } else {
+                    for (let i = newSize; i < oldSize; ++i) {
+                        this._history.pop().destroy();
+                    }
+                }
+
+                if (offset === 0 || oldSize === 0) {
+                    this._updatePage(1);
+                } else {
+                    this._updatePage((offset / oldSize) + 1);
+                }
+            });
+        });
     }
 
     _update(client, action, target, position) {
@@ -282,7 +290,7 @@ class GPasteIndicator extends PanelMenu.Button {
         }
     }
 
-    _updateVisibility(empty, search) {
+    _updateVisibility(empty) {
         if (!empty) {
             this._dummyHistoryItem.hide();
             this._emptyHistoryItem.show();
@@ -343,9 +351,13 @@ class GPasteIndicator extends PanelMenu.Button {
         } else {
             this._updateIndexVisibility(false);
         }
+        super._onOpenStateChanged(menu, state);
     }
 
     _onMenuKeyPress(actor, event) {
+        if(this._switch.active)
+            return super._onMenuKeyPress(actor, event);
+
         const symbol = event.get_key_symbol();
         if (symbol == Clutter.KEY_Left) {
             return this._pageSwitcher.previous();

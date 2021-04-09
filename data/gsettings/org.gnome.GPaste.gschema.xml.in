@@ -28,10 +28,10 @@
     </key>
 
     <key name="images-support" type="b">
-      <default>true</default>
+      <default>false</default>
       <summary>Do we save the images copied to history, or only text?</summary>
       <description>
-        By default, we're saving both
+        By default, we're saving only text
       </description>
     </key>
 
@@ -90,7 +90,7 @@
 
     <key name="max-text-item-size" type="t">
       <range min="1" max="2147483647"/>
-      <default>2147483647</default>
+      <default>1048575</default>
       <summary>Max text item size</summary>
       <description>
         Maximum size of a text item. Anything out of this boundary is ignored.
